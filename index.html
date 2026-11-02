@@ -1,22 +1,363 @@
-﻿
-<!DOCTYPE html> 
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevOps Lifecycle | My First Website Hosted on GitHub</title>
+<meta name="description" content="A one-page animated introduction to the DevOps lifecycle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070b17; --bg2:#0d1428; --card:#111a33; --line:#22305a;
+    --text:#e8edff; --muted:#93a0c8;
+    --a:#38bdf8; --b:#a78bfa; --c:#34d399; --d:#f472b6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+  code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 
-<html> 
+  /* animated background */
+  #bg{position:fixed;inset:0;z-index:-1}
+  .glow{position:fixed;width:520px;height:520px;border-radius:50%;filter:blur(120px);opacity:.25;z-index:-1;animation:float 14s ease-in-out infinite}
+  .glow.g1{background:var(--a);top:-120px;left:-120px}
+  .glow.g2{background:var(--b);bottom:-160px;right:-120px;animation-delay:-7s}
+  @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
 
-<head> 
+  /* nav */
+  nav{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;
+      background:rgba(7,11,23,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:50}
+  nav .logo{font-weight:700;letter-spacing:.5px}
+  nav .logo span{color:var(--a)}
+  nav ul{display:flex;gap:22px;list-style:none}
+  nav a{color:var(--muted);text-decoration:none;font-size:.95rem;transition:color .2s}
+  nav a:hover{color:var(--a)}
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--a),var(--b),var(--d));z-index:60}
 
-    <title>My Website</title> 
+  section{padding:110px 6vw 70px;max-width:1150px;margin:auto}
 
-</head> 
+  /* hero */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .badge{display:inline-block;padding:6px 16px;border:1px solid var(--line);border-radius:999px;color:var(--a);font-size:.85rem;
+         background:rgba(56,189,248,.08);margin-bottom:22px;animation:fadeUp .8s both}
+  h1{font-size:clamp(2.4rem,7vw,5rem);line-height:1.08;font-weight:700;animation:fadeUp .8s .15s both}
+  h1 .grad{background:linear-gradient(90deg,var(--a),var(--b),var(--d),var(--a));background-size:300% 100%;
+           -webkit-background-clip:text;background-clip:text;color:transparent;animation:shift 6s linear infinite}
+  @keyframes shift{to{background-position:300% 0}}
+  .typing{margin-top:22px;font-size:1.2rem;color:var(--muted);min-height:2em;animation:fadeUp .8s .3s both}
+  .typing .cursor{display:inline-block;width:2px;height:1.1em;background:var(--a);margin-left:3px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s .45s both}
+  .btn{padding:13px 28px;border-radius:12px;text-decoration:none;font-weight:600;transition:transform .2s,box-shadow .2s}
+  .btn.primary{background:linear-gradient(135deg,var(--a),var(--b));color:#06101f}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(56,189,248,.35)}
+  .btn.ghost{border:1px solid var(--line);color:var(--text)}
+  .btn.ghost:hover{border-color:var(--a);transform:translateY(-3px)}
+  .scroll-hint{position:absolute;bottom:28px;color:var(--muted);font-size:.8rem;animation:bounce 2s infinite}
+  @keyframes bounce{50%{transform:translateY(8px)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
-<body> 
+  /* headings */
+  .eyebrow{color:var(--a);font-size:.85rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  h2{font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:14px}
+  .lead{color:var(--muted);max-width:680px;margin-bottom:44px}
 
-    <h1>Welcome to My First DevOps Website</h1> 
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.show{opacity:1;transform:none}
 
-    <p>This is my first DevOps practice project.</p> 
-    <button>Contact Us</button>
+  /* infinity loop */
+  .loop-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:34px;align-items:center}
+  .loop-svg{width:100%;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px}
+  .loop-path{fill:none;stroke:url(#lg);stroke-width:5;stroke-linecap:round;stroke-dasharray:14 12;animation:dash 2s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-52}}
+  .node circle{fill:var(--bg2);stroke:var(--a);stroke-width:2;transition:all .25s;cursor:pointer}
+  .node text{fill:var(--text);font-size:12px;text-anchor:middle;pointer-events:none;font-family:'Space Grotesk'}
+  .node:hover circle,.node.active circle{fill:var(--a);stroke:#fff;filter:drop-shadow(0 0 10px var(--a))}
+  .node:hover text,.node.active text{fill:#06101f;font-weight:700}
+  .info{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;min-height:250px}
+  .info h3{font-size:1.6rem;color:var(--a);margin-bottom:8px}
+  .info p{color:var(--muted)}
+  .info .tools{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:.8rem;padding:5px 12px;border-radius:999px;background:rgba(167,139,250,.14);color:var(--b);border:1px solid rgba(167,139,250,.3)}
 
-</body> 
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;text-align:center;transition:transform .3s,border-color .3s}
+  .stat:hover{transform:translateY(-6px);border-color:var(--c)}
+  .stat .num{font-size:3rem;font-weight:700;color:var(--c)}
+  .stat .lbl{color:var(--muted);font-size:.95rem}
 
-</html> 
+  /* pipeline */
+  .pipeline{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;background:var(--card);
+            border:1px solid var(--line);border-radius:22px;padding:34px 24px}
+  .stage{flex:1;min-width:110px;text-align:center}
+  .stage .dot{width:58px;height:58px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;
+              border:2px solid var(--line);background:var(--bg2);transition:all .4s}
+  .stage.done .dot{border-color:var(--c);background:rgba(52,211,153,.15);box-shadow:0 0 22px rgba(52,211,153,.35)}
+  .stage.run .dot{border-color:var(--a);animation:pulse 1s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(56,189,248,0)}0%{box-shadow:0 0 0 0 rgba(56,189,248,.6)}}
+  .stage small{color:var(--muted)}
+  .bar{flex:.4;height:3px;background:var(--line);position:relative;overflow:hidden;border-radius:3px;min-width:20px}
+  .bar i{position:absolute;inset:0;width:0;background:var(--c);transition:width .6s}
+  .bar.fill i{width:100%}
+  .replay{margin-top:20px;background:none;border:1px solid var(--line);color:var(--text);padding:10px 22px;border-radius:10px;
+          cursor:pointer;font-family:inherit;transition:all .2s}
+  .replay:hover{border-color:var(--c);color:var(--c)}
 
+  /* terminal */
+  .terminal{background:#05080f;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .terminal .top{display:flex;gap:7px;padding:12px 16px;background:#0b1224}
+  .terminal .top span{width:12px;height:12px;border-radius:50%}
+  .terminal .top span:nth-child(1){background:#ff5f56}.terminal .top span:nth-child(2){background:#ffbd2e}.terminal .top span:nth-child(3){background:#27c93f}
+  .terminal pre{padding:22px;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:#b7f7c9;white-space:pre-wrap;min-height:210px}
+  .terminal .c{color:#6b7aa8}
+
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;transition:transform .3s,border-color .3s,box-shadow .3s;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transition:left .6s}
+  .card:hover::before{left:140%}
+  .card:hover{transform:translateY(-8px);border-color:var(--b);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+  .card .ico{font-size:2rem;margin-bottom:10px}
+  .card h3{margin-bottom:6px}
+  .card p{color:var(--muted);font-size:.95rem}
+
+  footer{text-align:center;padding:50px 20px 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}
+  footer b{color:var(--a)}
+
+  @media(max-width:820px){
+    .loop-wrap{grid-template-columns:1fr}
+    nav ul{display:none}
+    .bar{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<canvas id="bg"></canvas>
+<div class="glow g1"></div><div class="glow g2"></div>
+
+<nav>
+  <div class="logo">Dev<span>Ops</span>.lifecycle</div>
+  <ul>
+    <li><a href="#loop">Lifecycle</a></li>
+    <li><a href="#numbers">Impact</a></li>
+    <li><a href="#pipeline">CI/CD</a></li>
+    <li><a href="#practices">Practices</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <span class="badge">🚀 My first GitHub Pages deployment</span>
+  <h1>Build. Ship. <span class="grad">Repeat.</span><br>The DevOps Lifecycle</h1>
+  <p class="typing"><span id="typed"></span><span class="cursor"></span></p>
+  <div class="cta">
+    <a class="btn primary" href="#loop">Explore the loop</a>
+    <a class="btn ghost" href="#pipeline">Watch a pipeline run</a>
+  </div>
+  <div class="scroll-hint">scroll ↓</div>
+</section>
+
+<!-- LIFECYCLE -->
+<section id="loop">
+  <div class="reveal">
+    <div class="eyebrow">01 · The Big Picture</div>
+    <h2>One endless loop</h2>
+    <p class="lead">DevOps joins development and operations into a continuous cycle. Click any stage on the loop to see what happens there and which tools teams use.</p>
+  </div>
+  <div class="loop-wrap reveal">
+    <svg class="loop-svg" viewBox="0 0 600 300" aria-label="DevOps infinity loop">
+      <defs>
+        <linearGradient id="lg" x1="0" x2="1">
+          <stop offset="0" stop-color="#38bdf8"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f472b6"/>
+        </linearGradient>
+      </defs>
+      <path class="loop-path" d="M300 150 C 240 50, 80 50, 80 150 C 80 250, 240 250, 300 150 C 360 50, 520 50, 520 150 C 520 250, 360 250, 300 150 Z"/>
+      <circle r="8" fill="#fff">
+        <animateMotion dur="7s" repeatCount="indefinite" path="M300 150 C 240 50, 80 50, 80 150 C 80 250, 240 250, 300 150 C 360 50, 520 50, 520 150 C 520 250, 360 250, 300 150 Z"/>
+      </circle>
+      <g id="nodes"></g>
+      <text x="190" y="156" fill="#93a0c8" font-size="13" text-anchor="middle" font-family="Space Grotesk">DEV</text>
+      <text x="410" y="156" fill="#93a0c8" font-size="13" text-anchor="middle" font-family="Space Grotesk">OPS</text>
+    </svg>
+    <div class="info" id="info"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="numbers">
+  <div class="reveal">
+    <div class="eyebrow">02 · Why It Matters</div>
+    <h2>DevOps in numbers</h2>
+    <p class="lead">Teams that adopt DevOps practices tend to ship faster, break less and recover quicker. Illustrative figures from industry-style benchmarks:</p>
+  </div>
+  <div class="stats reveal">
+    <div class="stat"><div class="num"><span class="count" data-to="208">0</span>x</div><div class="lbl">more frequent deployments</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="106">0</span>x</div><div class="lbl">faster lead time to change</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="7">0</span>x</div><div class="lbl">lower change failure rate</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="2604">0</span>x</div><div class="lbl">faster recovery from incidents</div></div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section id="pipeline">
+  <div class="reveal">
+    <div class="eyebrow">03 · Automation</div>
+    <h2>A CI/CD pipeline, live</h2>
+    <p class="lead">Every push triggers an automated pipeline. Watch the stages run one after another.</p>
+  </div>
+  <div class="reveal">
+    <div class="pipeline" id="pipe"></div>
+    <button class="replay" id="replay">↻ Run pipeline again</button>
+  </div>
+  <br><br>
+  <div class="terminal reveal">
+    <div class="top"><span></span><span></span><span></span></div>
+    <pre id="term"></pre>
+  </div>
+</section>
+
+<!-- PRACTICES -->
+<section id="practices">
+  <div class="reveal">
+    <div class="eyebrow">04 · Core Ideas</div>
+    <h2>Practices that power DevOps</h2>
+    <p class="lead">A handful of habits make the loop work.</p>
+  </div>
+  <div class="grid">
+    <div class="card reveal"><div class="ico">🔁</div><h3>Continuous Integration</h3><p>Merge code often and run automated builds and tests on every change to catch bugs early.</p></div>
+    <div class="card reveal"><div class="ico">📦</div><h3>Continuous Delivery</h3><p>Keep software always releasable so deployments become small, safe and boring.</p></div>
+    <div class="card reveal"><div class="ico">🧱</div><h3>Infrastructure as Code</h3><p>Define servers and networks in version-controlled files instead of clicking through consoles.</p></div>
+    <div class="card reveal"><div class="ico">📈</div><h3>Monitoring &amp; Feedback</h3><p>Logs, metrics and alerts tell teams how releases behave so they can improve fast.</p></div>
+    <div class="card reveal"><div class="ico">🐳</div><h3>Containers</h3><p>Package apps with their dependencies so they run the same on a laptop and in production.</p></div>
+    <div class="card reveal"><div class="ico">🤝</div><h3>Culture &amp; Collaboration</h3><p>Shared ownership between developers and operations is the real heart of DevOps.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>Built with plain HTML, CSS &amp; JavaScript ·</p>
+  <p>Made by <b>Muhammad Saif</b> · DevOps Class Activity # 1 · 2026</p>
+</footer>
+
+<script>
+/* ---------- progress bar ---------- */
+const prog=document.getElementById('progress');
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+
+/* ---------- typing effect ---------- */
+const phrases=['Plan → Code → Build → Test','Release → Deploy → Operate → Monitor','Automate everything. Learn from every release.'];
+const typed=document.getElementById('typed');
+let pi=0,ci=0,del=false;
+(function type(){
+  const p=phrases[pi];
+  typed.textContent=p.slice(0,ci);
+  if(!del&&ci<p.length){ci++;setTimeout(type,60)}
+  else if(!del){del=true;setTimeout(type,1400)}
+  else if(ci>0){ci--;setTimeout(type,30)}
+  else{del=false;pi=(pi+1)%phrases.length;setTimeout(type,300)}
+})();
+
+/* ---------- particle background ---------- */
+const cv=document.getElementById('bg'),cx=cv.getContext('2d');
+let W,H,pts=[];
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;
+  pts=Array.from({length:Math.min(70,Math.floor(W/20))},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4}));}
+size();addEventListener('resize',size);
+(function draw(){
+  cx.clearRect(0,0,W,H);
+  pts.forEach((p,i)=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    cx.fillStyle='rgba(56,189,248,.6)';cx.beginPath();cx.arc(p.x,p.y,1.8,0,7);cx.fill();
+    for(let j=i+1;j<pts.length;j++){
+      const q=pts[j],d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<130){cx.strokeStyle='rgba(167,139,250,'+(1-d/130)*.25+')';cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke()}
+    }
+  });
+  requestAnimationFrame(draw);
+})();
+
+/* ---------- lifecycle nodes ---------- */
+const stages=[
+  {n:'Plan',x:150,y:92,d:'Teams define features, priorities and goals, breaking work into small trackable tasks.',t:['Jira','Trello','GitHub Issues']},
+  {n:'Code',x:80,y:150,d:'Developers write code and collaborate through version control, branches and pull requests.',t:['Git','GitHub','VS Code']},
+  {n:'Build',x:150,y:208,d:'Source code is compiled and packaged into artifacts or container images automatically.',t:['Maven','npm','Docker']},
+  {n:'Test',x:250,y:190,d:'Automated unit, integration and security tests verify every change before it moves on.',t:['Jest','Selenium','SonarQube']},
+  {n:'Release',x:350,y:110,d:'Approved builds are versioned and prepared for delivery to users.',t:['GitHub Actions','Jenkins','GitLab CI']},
+  {n:'Deploy',x:450,y:92,d:'Releases roll out to servers or the cloud, often with zero downtime strategies.',t:['Kubernetes','Terraform','Ansible']},
+  {n:'Operate',x:520,y:150,d:'Ops keeps systems healthy, scaled and secure while users rely on them.',t:['AWS','Azure','Linux']},
+  {n:'Monitor',x:450,y:208,d:'Metrics, logs and alerts feed real-world insight back into the next plan.',t:['Prometheus','Grafana','ELK']}
+];
+const g=document.getElementById('nodes'),info=document.getElementById('info');
+function show(i){
+  document.querySelectorAll('.node').forEach((n,k)=>n.classList.toggle('active',k===i));
+  const s=stages[i];
+  info.innerHTML=`<h3>${i+1}. ${s.n}</h3><p>${s.d}</p><div class="tools">${s.t.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`;
+}
+stages.forEach((s,i)=>{
+  const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+  el.setAttribute('class','node');
+  el.innerHTML=`<circle cx="${s.x}" cy="${s.y}" r="30"/><text x="${s.x}" y="${s.y+4}">${s.n}</text>`;
+  el.addEventListener('click',()=>{show(i);auto=false});
+  el.addEventListener('mouseenter',()=>{show(i);auto=false});
+  g.appendChild(el);
+});
+let cur=0,auto=true;show(0);
+setInterval(()=>{if(auto){cur=(cur+1)%stages.length;show(cur)}},3000);
+
+/* ---------- scroll reveal ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('show');
+    e.target.querySelectorAll('.count').forEach(runCount);
+    io.unobserve(e.target)}
+}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%4)*90+'ms';io.observe(el)});
+
+/* ---------- counters ---------- */
+function runCount(el){
+  if(el.dataset.done)return;el.dataset.done=1;
+  const to=+el.dataset.to,t0=performance.now(),dur=1800;
+  (function step(t){
+    const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*e).toLocaleString();
+    if(p<1)requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ---------- pipeline simulation ---------- */
+const steps=[['📥','Checkout','git clone'],['🔨','Build','npm run build'],['🧪','Test','npm test'],['🛡️','Scan','security audit'],['🚀','Deploy','gh-pages']];
+const pipe=document.getElementById('pipe'),term=document.getElementById('term');
+pipe.innerHTML=steps.map((s,i)=>`<div class="stage"><div class="dot">${s[0]}</div><b>${s[1]}</b><br><small>${s[2]}</small></div>`+(i<steps.length-1?'<div class="bar"><i></i></div>':'')).join('');
+const stageEls=[...pipe.querySelectorAll('.stage')],barEls=[...pipe.querySelectorAll('.bar')];
+const logs=[
+ '<span class="c"># git push origin main</span>',
+ '✔ Workflow triggered: deploy.yml',
+ '✔ Checked out repository',
+ '✔ Build succeeded (1.8s)',
+ '✔ 24 tests passed, 0 failed',
+ '✔ No vulnerabilities found',
+ '✔ Deployed to GitHub Pages',
+ '🎉 Live at https://yourname.github.io/'
+];
+let timers=[];
+function runPipe(){
+  timers.forEach(clearTimeout);timers=[];
+  stageEls.forEach(s=>s.className='stage');barEls.forEach(b=>b.className='bar');term.innerHTML='';
+  logs.forEach((l,i)=>timers.push(setTimeout(()=>{term.innerHTML+=l+'\n'},i*750)));
+  stageEls.forEach((s,i)=>{
+    timers.push(setTimeout(()=>s.classList.add('run'),i*1100));
+    timers.push(setTimeout(()=>{s.classList.remove('run');s.classList.add('done');if(barEls[i])barEls[i].classList.add('fill')},i*1100+900));
+  });
+}
+document.getElementById('replay').addEventListener('click',runPipe);
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){runPipe();o.disconnect()}},{threshold:.3}).observe(pipe);
+</script>
+</body>
+</html>
